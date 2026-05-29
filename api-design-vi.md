@@ -70,3 +70,158 @@ Tài liệu này mô tả các API Endpoint dạng REST dành cho dự án AutoW
 **⚠️ Lưu ý quan trọng khi triển khai code Backend:**
 *   Khi tạo đơn đặt lịch (`Booking`), bắt buộc code Backend phải kiểm tra xem khách hàng có đặt slot nằm trong phạm vi thời gian cho phép của hạng thành viên của họ hay không (FR-1.1).
 *   Giao dịch đổi điểm thành viên (`Loyalty Redemption`) phải thực hiện cơ chế đồng thời (atomic transaction) để tránh tình trạng trừ điểm sai sót khi có nhiều yêu cầu xử lý cùng lúc.
+
+---
+
+### 7. Quản lý Chi nhánh (Branch Management)
+
+#### `GET /api/branches`
+*   *Chức năng:* Lấy danh sách tất cả các chi nhánh đang hoạt động.
+*   *Xác thực:* Công khai (Public).
+*   *Kết quả phản hồi:* `200 OK` — Mảng chứa các đối tượng chi nhánh (id, name, address, capacity, operating_hours, is_active).
+
+#### `GET /api/branches/:id`
+*   *Chức năng:* Lấy thông tin chi tiết của một chi nhánh theo ID.
+*   *Xác thực:* Đã đăng nhập (Authenticated).
+*   *Kết quả phản hồi:* `200 OK` — Đối tượng thông tin chi nhánh.
+
+#### `POST /api/admin/branches`
+*   *Chức năng:* Tạo mới một chi nhánh.
+*   *Xác thực:* Quản trị viên (Admin).
+*   *Tham số truyền vào (Body JSON):* `{ name, address, capacity, operating_hours }`.
+*   *Kết quả phản hồi:* `201 Created`.
+
+#### `PUT /api/admin/branches/:id`
+*   *Chức năng:* Cập nhật thông tin chi tiết của một chi nhánh.
+*   *Xác thực:* Quản trị viên (Admin).
+*   *Kết quả phản hồi:* `200 OK`.
+
+#### `PATCH /api/admin/branches/:id/status`
+*   *Chức năng:* Kích hoạt hoặc tạm ngưng hoạt động của một chi nhánh (BR-88).
+*   *Xác thực:* Quản trị viên (Admin).
+*   *Tham số truyền vào (Body JSON):* `{ is_active: boolean }`.
+*   *Kết quả phản hồi:* `200 OK`.
+
+#### `GET /api/admin/branches/:id/revenue`
+*   *Chức năng:* Lấy báo cáo doanh thu của chi nhánh (BR-86).
+*   *Xác thực:* Quản trị viên (Admin) / Quản lý chi nhánh (Branch Manager).
+*   *Tham số truy vấn (Query):* `period` (lọc theo `daily`, `weekly`, `monthly`).
+*   *Kết quả phản hồi:* `200 OK` — Đối tượng chứa dữ liệu doanh thu.
+
+---
+
+### 8. Quản lý Nhân viên (Staff Management)
+
+#### `GET /api/branches/:branchId/staff`
+*   *Chức năng:* Lấy danh sách nhân viên của một chi nhánh (BR-89).
+*   *Xác thực:* Quản trị viên (Admin) / Quản lý chi nhánh (Branch Manager).
+*   *Kết quả phản hồi:* `200 OK` — Mảng chứa các đối tượng nhân viên.
+
+#### `POST /api/admin/staff`
+*   *Chức năng:* Đăng ký thông tin cho một nhân viên mới (BR-61, BR-62).
+*   *Xác thực:* Quản trị viên (Admin).
+*   *Tham số truyền vào (Body JSON):* `{ user_id, branch_id, employment_type, probation_end_date? }`.
+*   *Kết quả phản hồi:* `201 Created`.
+
+#### `PUT /api/admin/staff/:id`
+*   *Chức năng:* Cập nhật thông tin chi tiết của nhân viên.
+*   *Xác thực:* Quản trị viên (Admin).
+*   *Kết quả phản hồi:* `200 OK`.
+
+---
+
+### 9. Ca làm & Chấm công (Shift & Attendance)
+
+#### `POST /api/admin/shifts`
+*   *Chức năng:* Tạo mới và phân lịch ca làm việc cho nhân viên (BR-71, BR-72).
+*   *Xác thực:* Quản trị viên (Admin) / Quản lý chi nhánh (Branch Manager).
+*   *Tham số truyền vào (Body JSON):* `{ staff_id, branch_id, start_time, end_time }`.
+*   *Ràng buộc kiểm tra (Validation):* Không được phân trùng ca làm việc cho cùng một nhân viên trong cùng một khung giờ.
+*   *Kết quả phản hồi:* `201 Created`.
+
+#### `GET /api/branches/:branchId/shifts`
+*   *Chức năng:* Lấy danh sách các ca làm việc của một chi nhánh.
+*   *Xác thực:* Quản trị viên (Admin) / Quản lý chi nhánh (Branch Manager).
+*   *Tham số truy vấn (Query):* `date`, `staff_id`.
+*   *Kết quả phản hồi:* `200 OK`.
+
+#### `POST /api/attendance/check-in`
+*   *Chức năng:* Nhân viên thực hiện Check-in vào ca làm (BR-64, BR-65).
+*   *Xác thực:* Nhân viên (Staff).
+*   *Tham số truyền vào (Body JSON):* `{ shift_id }`.
+*   *Kết quả phản hồi:* `200 OK` — Hệ thống ghi nhận lại thời gian thực tế bắt đầu ca làm.
+
+#### `POST /api/attendance/check-out`
+*   *Chức năng:* Nhân viên thực hiện Check-out khi hết ca (BR-64, BR-65).
+*   *Xác thực:* Nhân viên (Staff).
+*   *Tham số truyền vào (Body JSON):* `{ shift_id }`.
+*   *Kết quả phản hồi:* `200 OK` — Hệ thống ghi nhận lại thời gian thực tế kết thúc ca làm và tự động tính toán tổng số giờ làm việc thực tế.
+
+#### `GET /api/branches/:branchId/attendance/summary`
+*   *Chức năng:* Lấy báo cáo tổng hợp tình hình chấm công hàng tháng của chi nhánh (BR-70, BR-76).
+*   *Xác thực:* Quản trị viên (Admin) / Quản lý chi nhánh (Branch Manager).
+*   *Tham số truy vấn (Query):* `month`, `year`.
+*   *Kết quả phản hồi:* `200 OK` — Báo cáo tổng hợp số giờ làm việc, số giờ tăng ca (overtime), số ngày vắng (absences), và các lần đi trễ.
+
+#### `POST /api/admin/leave-requests`
+*   *Chức năng:* Nhân viên nộp đơn xin nghỉ phép (BR-77).
+*   *Xác thực:* Nhân viên (Staff).
+*   *Tham số truyền vào (Body JSON):* `{ shift_id, reason }`.
+*   *Kết quả phản hồi:* `201 Created`.
+
+#### `PATCH /api/admin/leave-requests/:id`
+*   *Chức năng:* Quản trị viên phê duyệt hoặc từ chối đơn xin nghỉ phép (BR-77).
+*   *Xác thực:* Quản trị viên (Admin).
+*   *Tham số truyền vào (Body JSON):* `{ status: approved|rejected }`.
+*   *Kết quả phản hồi:* `200 OK`.
+
+---
+
+### 10. Đánh giá & Phản hồi (Reviews)
+
+#### `POST /api/bookings/:bookingId/reviews`
+*   *Chức năng:* Khách hàng gửi đánh giá cho đơn đặt lịch đã hoàn thành (BR-45, BR-46).
+*   *Xác thực:* Khách hàng (Customer).
+*   *Tham số truyền vào (Body JSON):* `{ rating (1-5), comment? }`.
+*   *Ràng buộc kiểm tra (Validation):* Đơn đặt lịch bắt buộc phải ở trạng thái Completed. Mỗi đơn đặt lịch chỉ được phép đánh giá tối đa 1 lần.
+*   *Tác vụ đi kèm (Side Effect):* Nếu đánh giá dưới 3 sao (rating < 3), hệ thống sẽ gửi một thông báo cảnh báo tới Quản lý chi nhánh (BR-47).
+*   *Kết quả phản hồi:* `201 Created`.
+
+#### `GET /api/bookings/:bookingId/reviews`
+*   *Chức năng:* Lấy thông tin đánh giá của một đơn đặt lịch.
+*   *Xác thực:* Đã đăng nhập (Authenticated).
+*   *Kết quả phản hồi:* `200 OK` — Đối tượng chứa thông tin đánh giá hoặc 404.
+
+#### `GET /api/branches/:branchId/reviews`
+*   *Chức năng:* Lấy danh sách tất cả các đánh giá của một chi nhánh.
+*   *Xác thực:* Quản trị viên (Admin) / Quản lý chi nhánh (Branch Manager).
+*   *Tham số truy vấn (Query):* `min_rating`, `max_rating`, `page`, `limit`.
+*   *Kết quả phản hồi:* `200 OK` — Mảng danh sách đánh giá có phân trang.
+
+---
+
+### 11. Mã giảm giá & Khuyến mãi (Vouchers & Promotions)
+
+#### `GET /api/customers/:customerId/vouchers`
+*   *Chức năng:* Lấy danh sách các mã giảm giá (voucher) đang hoạt động của khách hàng.
+*   *Xác thực:* Khách hàng (Customer).
+*   *Kết quả phản hồi:* `200 OK` — Mảng chứa các đối tượng mã giảm giá.
+
+#### `POST /api/vouchers/validate`
+*   *Chức năng:* Kiểm tra và xác thực tính hợp lệ của mã giảm giá trước khi áp dụng vào đơn đặt lịch (BR-56).
+*   *Xác thực:* Đã đăng nhập (Authenticated).
+*   *Tham số truyền vào (Body JSON):* `{ code, order_total, services[] }`.
+*   *Ràng buộc kiểm tra (Validation):* Kiểm tra hạn sử dụng (BR-53, BR-54), kiểm tra nguyên tắc không áp dụng trùng lặp giảm giá (BR-55) và các quy tắc áp dụng ưu đãi cộng dồn (BR-59).
+*   *Kết quả phản hồi:* `200 OK` — `{ valid, discount_amount, reason? }`.
+
+#### `POST /api/admin/vouchers`
+*   *Chức năng:* Tạo mới một mã giảm giá hoặc chương trình ưu đãi (BR-41).
+*   *Xác thực:* Quản trị viên (Admin).
+*   *Tham số truyền vào (Body JSON):* `{ code, discount_type, discount_value, min_order_value?, expires_at, customer_id?, branch_id? }`.
+*   *Kết quả phản hồi:* `201 Created`.
+
+#### `POST /api/admin/promotions`
+*   *Chức năng:* Tạo mới một chiến dịch khuyến mãi diện rộng (BR-41).
+*   *Xác thực:* Quản trị viên (Admin).
+*   *Tham số truyền vào (Body JSON):* `{ name, description, start_date, end_date, discount_type, discount_value, applicable_branches[], applicable_tiers[] }`.
+*   *Kết quả phản hồi:* `201 Created`.
