@@ -46,11 +46,40 @@ AutoWash Pro is an automated vehicle wash management platform designed to automa
 - **FR-4.1**: The system shall provide an administrative interface to configure tier thresholds, point accrual rates, perk definitions, and target promotion parameters.
 - **FR-4.2**: The system shall generate and display charts showing key performance indicators (KPIs), transaction summaries, and active promotions.
 
+#### 5. Review & Feedback
+- **FR-5.1**: The system shall allow customers to submit a review only after completing a booked service.
+- **FR-5.2**: The system shall limit each booking to exactly one review submission.
+- **FR-5.3**: The system shall automatically trigger an alert notification to the branch manager when a review is rated below 3 stars.
+
+#### 6. Voucher & Promotions
+- **FR-6.1**: The system shall automatically issue a discount voucher for the following month to customers who complete 5 or more bookings within a calendar month.
+- **FR-6.2**: The system shall automatically send a retention offer to VIP-tier customers who have been inactive for more than 30 consecutive days.
+- **FR-6.3**: The system shall enforce a maximum of 1 voucher and 1 tier-based benefit per order.
+- **FR-6.4**: The system shall validate all promotional code conditions before application and reject codes that do not meet eligibility requirements.
+- **FR-6.5**: The system shall not apply promotions to services that are already discounted.
+- **FR-6.6**: The system shall enforce voucher expiration dates and prevent usage of expired vouchers.
+
+#### 7. Staff & Attendance Management
+- **FR-7.1**: The system shall assign each staff member to exactly one primary branch with an employment type of Part-time or Full-time.
+- **FR-7.2**: The system shall require staff to check-in and check-out for each work shift and record actual timestamps.
+- **FR-7.3**: The system shall automatically mark staff as absent if no check-in record exists for a scheduled shift.
+- **FR-7.4**: The system shall automatically calculate total working hours, flag overtime hours separately, and compile monthly attendance summaries.
+- **FR-7.5**: The system shall enforce that no staff member is assigned two overlapping shifts.
+- **FR-7.6**: The system shall require admin approval for all staff leave requests.
+- **FR-7.7**: The system shall display late attendance records on the branch management dashboard.
+
+#### 8. Branch Management
+- **FR-8.1**: The system shall maintain independent configuration for each branch including vehicle capacity, operating hours, and service availability.
+- **FR-8.2**: The system shall restrict branch manager data access exclusively to their assigned branch.
+- **FR-8.3**: The system shall allow customers to book services across different branches.
+- **FR-8.4**: The system shall track and report revenue separately for each branch.
+- **FR-8.5**: The system shall allow system administrators to activate or deactivate branches.
+
 ### Constraints & Notes
 - **CON-1**: Online payment gateway integration and financial refund transactions are out of scope for implementation.
 
 ### Main Entities
-- Customer, Booking, LoyaltyPoints, Vehicle, Promotion, Tier, Transaction
+- Customer, Booking, LoyaltyPoints, Vehicle, Promotion, Tier, Transaction, Branch, Staff, Shift, Attendance, Review, Voucher
 
 ### Timeline (Planned — 16 weeks)
 - Phase 1 (Weeks 1–4): Prototype, database design, website setup with account management and booking capabilities.
@@ -74,6 +103,7 @@ AutoWash Pro is an automated vehicle wash management platform designed to automa
 | Customer | Accesses services, schedules slot bookings, views points balance and vehicles. |
 | Admin | Configures system rules, manages promotions, views performance analytics and KPIs. |
 | System (Automated) | Runs monthly tier recalculations, tracks point expiration, enforces booking slot availability constraints. |
+| Staff / Branch Manager | Manages shift attendance, views branch-specific data and reports. |
 
 ## Key Business Rules (summary)
 

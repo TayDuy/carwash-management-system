@@ -1,4 +1,4 @@
-# Frontend Pages & User Flows — AutoWash Pro
+# Frontend Pages — AutoWash Pro
 
 Purpose: single reference describing screens, primary actors, key components, and step-by-step user flows for the AutoWash Pro project. Use this to implement UI, wireframes, and route maps.
 
@@ -79,3 +79,146 @@ API interactions (examples)
 - High-fidelity prototypes for core flows: Booking, Mentor Chat, Result Publishing
 - Component library (React/Vue) with documented props and states
 - Route map and OpenAPI-backed mock server for front-end dev
+
+---
+
+## 5. Review Pages
+
+### 5.1 Submit Review Page
+- **Route**: `/bookings/:id/review`
+- **Access**: Customer
+- **Purpose**: Allow customers to submit a star rating (1-5) and optional text comment after booking completion (BR-45).
+- **Features**:
+  - Star rating selector (1-5 stars, interactive)
+  - Text area for optional comment
+  - Submit button (disabled if booking is not Completed)
+  - Success confirmation modal
+- **Validation**: Only accessible for bookings with status `Completed` and no existing review (BR-46).
+
+### 5.2 Branch Reviews Dashboard
+- **Route**: `/admin/branches/:id/reviews`
+- **Access**: Admin, Branch Manager
+- **Purpose**: View all customer reviews for a specific branch.
+- **Features**:
+  - Average rating display with star visualization
+  - Filter by rating (1-5)
+  - Alert badge for reviews < 3 stars (BR-47)
+  - Paginated review list with customer info, rating, comment, and date
+  - Export to CSV
+
+---
+
+## 6. Staff & Attendance Pages
+
+### 6.1 Staff List Page
+- **Route**: `/admin/branches/:id/staff`
+- **Access**: Admin, Branch Manager
+- **Purpose**: View and manage staff members assigned to a branch (BR-61, BR-89).
+- **Features**:
+  - Table: Name, Employment Type (Full-time/Part-time), Probation Status, Active Status
+  - Add Staff modal (select user, employment type, probation end date)
+  - Edit/Deactivate staff
+  - Filter by employment type
+
+### 6.2 Shift Management Page
+- **Route**: `/admin/branches/:id/shifts`
+- **Access**: Admin, Branch Manager
+- **Purpose**: Create and manage shift schedules (BR-71, BR-72).
+- **Features**:
+  - Calendar/timeline view showing shifts by day
+  - Create Shift modal (select staff, start time, end time)
+  - Overlap detection warning (BR-72)
+  - Drag-and-drop shift rescheduling
+  - Color-coded by staff member
+
+### 6.3 Attendance Dashboard
+- **Route**: `/admin/branches/:id/attendance`
+- **Access**: Admin, Branch Manager
+- **Purpose**: View and manage attendance records (BR-70, BR-76).
+- **Features**:
+  - Daily view: List of staff with check-in/check-out times, status (present/absent/late)
+  - Late attendance highlighted in red (BR-78)
+  - Monthly summary tab: Total hours, overtime hours (BR-75), absence count
+  - Export attendance report
+  - Leave request approval queue (BR-77)
+
+### 6.4 Staff Check-in/Check-out Page
+- **Route**: `/staff/attendance`
+- **Access**: Staff
+- **Purpose**: Allow staff members to check-in and check-out for their shifts (BR-64).
+- **Features**:
+  - Current shift display (start/end time)
+  - Check-in button (records actual timestamp)
+  - Check-out button (records actual timestamp)
+  - Personal attendance history
+  - Monthly hours summary
+
+---
+
+## 7. Branch Management Pages
+
+### 7.1 Branch List Page
+- **Route**: `/admin/branches`
+- **Access**: Admin
+- **Purpose**: View and manage all branches (BR-88).
+- **Features**:
+  - Table: Name, Address, Capacity, Status (Active/Inactive)
+  - Create Branch modal
+  - Edit branch details
+  - Activate/Deactivate toggle (BR-88)
+  - Link to branch-specific dashboards (staff, shifts, attendance, reviews, revenue)
+
+### 7.2 Branch Revenue Dashboard
+- **Route**: `/admin/branches/:id/revenue`
+- **Access**: Admin, Branch Manager
+- **Purpose**: View revenue statistics for a specific branch (BR-86).
+- **Features**:
+  - Revenue charts (daily, weekly, monthly)
+  - Comparison with previous periods
+  - Top services by revenue
+  - Booking count metrics
+  - Export revenue report
+
+### 7.3 Branch Settings Page
+- **Route**: `/admin/branches/:id/settings`
+- **Access**: Admin
+- **Purpose**: Configure branch-specific settings (BR-81, BR-85, BR-87).
+- **Features**:
+  - Vehicle capacity configuration
+  - Operating hours editor (per day of week)
+  - Service availability toggles
+  - Branch-specific promotion settings (BR-90)
+
+---
+
+## 8. Voucher & Promotion Pages
+
+### 8.1 Promotions Management Page
+- **Route**: `/admin/promotions`
+- **Access**: Admin
+- **Purpose**: Create and manage promotional campaigns (BR-41).
+- **Features**:
+  - Active/Expired/Scheduled promotion tabs
+  - Create Promotion form (name, discount type, value, date range, applicable branches, applicable tiers)
+  - Edit/Delete promotion
+  - Usage statistics per promotion
+
+### 8.2 Voucher Management Page
+- **Route**: `/admin/vouchers`
+- **Access**: Admin
+- **Purpose**: Create and manage vouchers.
+- **Features**:
+  - Create voucher form (code, discount type/value, expiry, min order value, target customer/branch)
+  - Voucher list with status (active/used/expired)
+  - Bulk voucher generation
+  - Usage tracking
+
+### 8.3 My Vouchers Page (Customer)
+- **Route**: `/my-vouchers`
+- **Access**: Customer
+- **Purpose**: View personal voucher wallet.
+- **Features**:
+  - Active vouchers with expiry countdown
+  - Used vouchers history
+  - Expired vouchers (greyed out)
+  - Quick copy voucher code
