@@ -1,17 +1,17 @@
-# System Architecture — Spring Boot (Backend) + React (Frontend)
+# System Architecture — Spring Boot (Backend) + React (Frontend) — AutoWash Pro
 
 ## Overview
-This architecture targets three product domains (AutoWash, Career Roadmap, Horse Racing) using a common stack: Spring Boot microservices (or modular monolith) for backend services, React SPA for frontend, PostgreSQL for primary storage, Redis for caching, and message broker for async tasks. Designed for cloud-native deployments (Docker + Kubernetes) with CI/CD via GitHub Actions.
+This architecture targets the AutoWash Pro system using a common stack: Spring Boot microservices (or modular monolith) for backend services, React SPA for frontend, PostgreSQL for primary storage, Redis for caching, and a message broker for async tasks. Designed for cloud-native deployments (Docker + Kubernetes) with CI/CD via GitHub Actions.
 
 ## High-level Components
-- Frontend: React (Vite/CRA) single-page app(s)
-  - Route patterns: /, /auth, /booking, /account, /admin, /mentor, /roadmaps, /tournaments
+- Frontend: React (Vite) single-page app
+  - Route patterns: /, /auth, /booking, /account, /admin, /notifications
   - Auth flow: JWT stored in secure, HttpOnly cookie or memory; refresh tokens via endpoint
   - Component library: shared UI components, design tokens
 
 - Backend: Spring Boot (Java/Kotlin)
   - API Gateway / Ingress: Traefik or AWS ALB
-  - Services (modular or microservices): auth, customer, booking, loyalty, admin, roadmap, mentor-proxy, racing
+  - Services (modular or microservices): auth, customer, booking, loyalty, admin
   - Shared libs: common-models, security, exceptions, dto-mappers
   - Background workers: Spring @Scheduled / Quartz or a dedicated worker service consuming messages
 
@@ -29,15 +29,14 @@ This architecture targets three product domains (AutoWash, Career Roadmap, Horse
 
 ## Security
 - Transport: HTTPS only, HSTS
-- Auth: JWT (access + refresh) and OAuth 2.0 (Google) for social sign-in
-- RBAC: Spring Security with role-based access checks (USER, ADMIN, REFEREE)
+- Auth: JWT (access + refresh)
+- RBAC: Spring Security with role-based access checks (USER, ADMIN)
 - Secrets: store in Vault or Kubernetes Secrets
 - Rate limiting: API Gateway or Redis-based leaky-bucket
-- Input validation and output sanitization, especially LLM outputs (sanitize links, strip secrets)
+- Input validation and output sanitization
 
 ## Data Flow Examples
 - Booking flow (sync + async): Frontend -> POST /api/v1/bookings -> Booking service validates tier windows (cache + DB) -> persist booking -> emit event to message broker -> Loyalty service listens and accrues points after completion -> notifications service sends confirmation
-- LLM Query: Frontend -> POST /api/v1/mentor/query -> Mentor-proxy service adds user context, forwards to LLM provider via server-side key, stores response in DB, returns sanitized answer
 
 ## Resilience & Scaling
 - Stateless backend instances behind load balancer; scale horizontally
@@ -51,9 +50,9 @@ This architecture targets three product domains (AutoWash, Career Roadmap, Horse
 - Migrations: Run Flyway as pre-deploy job or init container
 
 ## Suggested Repository Layout
-- /backend/ (Spring Boot multi-module or multiple services)
-  - /backend/auth, /backend/booking, /backend/loyalty, /backend/roadmap, /backend/mentor-proxy, /backend/common
-- /frontend/ (React monorepo or multiple apps)
+- /backend/ (Spring Boot modular monolith)
+  - /backend/auth, /backend/booking, /backend/loyalty, /backend/common
+- /frontend/ (React App)
 - /infra/ (k8s manifests, helm charts, terraform)
 - /api/ (OpenAPI specs)
 - /migrations/ (flyway)
@@ -65,13 +64,10 @@ This architecture targets three product domains (AutoWash, Career Roadmap, Horse
 - SPRING_DATASOURCE_PASSWORD=secret
 - REDIS_URL=redis://redis:6379
 - BROKER_URL=amqp://rabbitmq:5672
-- OAUTH_GOOGLE_CLIENT_ID=...
-- OAUTH_GOOGLE_CLIENT_SECRET=...
-- LLM_API_KEY (store securely)
 
 ## Monitoring & Alerts
 - Alerts: high error rate, booking failure rate spike, queue backlog growth, DB connections near limit
-- Dashboards: Booking throughput, Loyalty redemptions, API latency, LLM error rate
+- Dashboards: Booking throughput, Loyalty redemptions, API latency
 
 ## Operational Concerns
 - Backups: daily DB dumps + WAL archiving
@@ -86,4 +82,4 @@ This architecture targets three product domains (AutoWash, Career Roadmap, Horse
 
 ---
 
-Notes: prefer a modular monolith to start (simpler local dev), split into microservices as scale requires. Use feature flags for risky features (LLM, payments in future).
+Notes: prefer a modular monolith to start (simpler local dev), split into microservices as scale requires.

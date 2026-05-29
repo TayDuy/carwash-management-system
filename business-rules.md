@@ -1,6 +1,6 @@
 # Business Rules
 
-This document lists enforceable business rules for all three projects. Each rule includes scope, enforcement type, priority, and notes.
+This document lists enforceable business rules for the AutoWash Pro project. Each rule includes scope, enforcement type, priority, and notes.
 
 ## Rule Table Legend
 | Field | Meaning |
@@ -17,7 +17,7 @@ This document lists enforceable business rules for all three projects. Each rule
 
 | ID | Scope | Rule | Enforcement | Priority | Notes |
 |---|---:|---|---|---:|---|
-| BR-G1 | All | All user actions that modify persistent state require authentication | System | High | JWT-based sessions or OAuth |
+| BR-G1 | All | All user actions that modify persistent state require authentication | System | High | JWT-based sessions |
 | BR-G2 | All | Audit trail must record user, timestamp, and action for critical events | System | High | Stored in append-only logs |
 | BR-G3 | All | PII must be stored encrypted-at-rest and masked in UIs | System/Admin | High | Follow local data regulations |
 
@@ -36,29 +36,6 @@ This document lists enforceable business rules for all three projects. Each rule
 
 ---
 
-## SU26SWP02 (Career Roadmap) Rules
-
-| ID | Rule | Enforcement | Priority | Notes |
-|---|---|---|---:|---|
-| BR-C01 | LLM responses may include external links but must not expose API keys | System | High | Sanitize outputs; proxy external calls if needed |
-| BR-C02 | Market scraping must respect robots.txt and rate limits | System | High | Use scheduled jobs & caching |
-| BR-C03 | Students control which GitHub repos are synced/shared publicly | System | High | OAuth scopes and consent screens required |
-| BR-C04 | Generated reports (PDF) must not contain PII unless user consents | System | Medium | Consent checkbox on generation |
-
----
-
-## SU26SWP03 (Horse Racing)
-
-| ID | Rule | Enforcement | Priority | Notes |
-|---|---|---|---:|---|
-| BR-H01 | Only Admins or assigned referees may publish official race results | System | High | Results in "draft" until published |
-| BR-H02 | Registrations must be approved before a horse is scheduled in a race | System/Admin | High | Admin action required for approval |
-| BR-H03 | Betting/prediction mechanics must clearly mark results as unofficial unless validated | System | High | Distinguish between predictive features and official results |
-
----
-
 ## Out of Scope
-- Payment gateway implementation (SU26SWP01)
-- Handling financial refunds and chargebacks (SU26SWP01)
-
-
+- Payment gateway implementation
+- Handling financial refunds and chargebacks
