@@ -1,17 +1,17 @@
 # MVC2 and 3-Layer Architecture in AutoWash Pro
 
-This document describes how the **AutoWash Pro** system integrates the **MVC2** model and **3-Layer Architecture** using **Spring Boot (Backend)** and **C# Blazor (Frontend)**.
+This document describes how the **AutoWash Pro** system integrates the **MVC2** model and **3-Layer Architecture** using **Spring Boot (Backend)** and **React / JavaScript (Frontend)**.
 
 ## 1. Integrating MVC2 and 3-Layer Architecture
 Following the modern client-server model:
-- **View:** Completely decoupled to the Frontend using **C# Blazor WebAssembly** (running directly in the browser via WebAssembly).
+- **View:** Completely decoupled to the Frontend using **React (JavaScript)**.
 - **Controller and Model:** Handled on the Backend using **Spring Boot** (Java).
 - The Spring Boot Backend itself is structured using the **3-Layer Architecture** to ensure maintainability and scalability.
 
 ## 2. The 3-Layer Model (Spring Boot Backend)
 
 ### Layer 1: Presentation Layer (Controller Layer)
-- **Role:** Handles HTTP Requests from the Blazor Frontend, validates JWTs, validates input data (DTOs), and returns HTTP Responses (JSON). This layer does NOT contain business logic.
+- **Role:** Handles HTTP Requests from the React Frontend, validates JWTs, validates input data (DTOs), and returns HTTP Responses (JSON). This layer does NOT contain business logic.
 - **Components:** Classes annotated with `@RestController`.
 - **Examples:** `BookingController`, `AuthController`.
 
@@ -73,56 +73,55 @@ backend/
 │       └── entity/LoyaltyPoints.java
 ```
 
-### Frontend (C# Blazor WebAssembly - MVC View Role)
-In the Blazor model, we write UI using HTML combined with C# code (`.razor`) instead of JavaScript/React.
-
+### Frontend (React / JavaScript - MVC View Role)
 ```text
 frontend/
-├── AutoWash.Frontend.csproj             (C# Blazor Project File)
-├── Program.cs                           (DI Configuration, HttpClient Setup)
-├── wwwroot/                             (Static web assets)
-│   ├── css/app.css
-│   └── index.html
-│
-├── Services/                            (API Client Layer connecting to Backend)
-│   ├── HttpInterceptorService.cs        (Automatically attaches JWT Tokens)
-│   ├── IBookingService.cs
-│   ├── BookingService.cs                (Calls /api/v1/bookings)
-│   ├── ICustomerService.cs
-│   └── IAuthService.cs
-│
-├── Models/                              (DTOs mapped from Backend)
-│   ├── BookingRequest.cs
-│   ├── BookingResponse.cs
-│   └── CustomerProfile.cs
-│
-├── Components/                          (Shared UI Components)
-│   ├── Common/                          
-│   ├── Booking/                     
-│   │   ├── BranchSelector.razor         
-│   │   ├── TimeSlotPicker.razor         
-│   │   └── VehiclePicker.razor          
-│   └── Layout/
-│       ├── MainLayout.razor
-│       └── NavMenu.razor
-│
-├── Pages/                               (MAIN VIEWS)
-│   ├── Auth/
-│   │   └── Login.razor
+├── src/
+│   ├── api/                             (API Client Layer)
+│   │   ├── axiosClient.js               
+│   │   ├── bookingApi.js                
+│   │   ├── customerApi.js               
+│   │   ├── branchApi.js                 
+│   │   └── loyaltyApi.js                
 │   │
-│   ├── Customer/                        (User Portal)
-│   │   ├── Dashboard.razor              
-│   │   ├── MyVehicles.razor             
-│   │   └── MyVouchers.razor
+│   ├── context/                         (Global State Management)
+│   │   ├── AuthContext.jsx              
+│   │   └── BookingFlowContext.jsx       
 │   │
-│   ├── Booking/                         (Booking Flow)
-│   │   ├── CreateBooking.razor          
-│   │   └── BookingSuccess.razor   
+│   ├── hooks/                           (Custom Logic)
+│   │   ├── useVehicles.js               
+│   │   └── useAvailableSlots.js         
 │   │
-│   └── Admin/                           (Admin & Staff Portal)
-│       ├── BranchManagement.razor       
-│       └── StaffManagement.razor        
-│
-├── _Imports.razor                       (Global using directives)
-└── App.razor                            (Routing Configuration)
+│   ├── components/                      (Shared UI Components)
+│   │   ├── common/                      
+│   │   ├── booking/                     
+│   │   │   ├── BranchSelector.jsx       
+│   │   │   ├── TimeSlotPicker.jsx       
+│   │   │   └── VehiclePicker.jsx        
+│   │   └── reviews/
+│   │       └── StarRating.jsx
+│   │
+│   ├── pages/                           (MAIN VIEWS)
+│   │   ├── auth/
+│   │   │   └── Login.jsx
+│   │   │
+│   │   ├── customer/                    (User Portal)
+│   │   │   ├── Dashboard.jsx            
+│   │   │   ├── MyVehicles.jsx           
+│   │   │   └── MyVouchers.jsx
+│   │   │
+│   │   ├── booking/                     (Booking Flow)
+│   │   │   ├── CreateBookingPage.jsx    
+│   │   │   └── BookingSuccessPage.jsx   
+│   │   │
+│   │   └── admin/                       (Admin & Staff Portal)
+│   │       ├── BranchManagement.jsx     
+│   │       ├── StaffManagement.jsx      
+│   │       └── AttendanceCheck.jsx      
+│   │
+│   ├── routes/
+│   │   ├── AppRoutes.jsx                
+│   │   └── PrivateRoute.jsx             
+│   │
+│   └── App.jsx
 ```
