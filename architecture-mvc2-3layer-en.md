@@ -1,17 +1,17 @@
 # MVC2 and 3-Layer Architecture in AutoWash Pro
 
-This document describes how the **AutoWash Pro** system integrates the **MVC2** model and **3-Layer Architecture** using **Spring Boot (Backend)** and **React (Frontend)**.
+This document describes how the **AutoWash Pro** system integrates the **MVC2** model and **3-Layer Architecture** using **Spring Boot (Backend)** and **C# Blazor (Frontend)**.
 
 ## 1. Integrating MVC2 and 3-Layer Architecture
 Following the modern client-server model:
-- **View:** Completely decoupled to the Frontend using **React**.
-- **Controller and Model:** Handled on the Backend using **Spring Boot**.
+- **View:** Completely decoupled to the Frontend using **C# Blazor WebAssembly** (running directly in the browser via WebAssembly).
+- **Controller and Model:** Handled on the Backend using **Spring Boot** (Java).
 - The Spring Boot Backend itself is structured using the **3-Layer Architecture** to ensure maintainability and scalability.
 
 ## 2. The 3-Layer Model (Spring Boot Backend)
 
 ### Layer 1: Presentation Layer (Controller Layer)
-- **Role:** Handles HTTP Requests from React, validates JWTs, validates input data (DTOs), and returns HTTP Responses (JSON). This layer does NOT contain business logic.
+- **Role:** Handles HTTP Requests from the Blazor Frontend, validates JWTs, validates input data (DTOs), and returns HTTP Responses (JSON). This layer does NOT contain business logic.
 - **Components:** Classes annotated with `@RestController`.
 - **Examples:** `BookingController`, `AuthController`.
 
@@ -40,10 +40,6 @@ backend/
 │   │   ├── dto/ApiResponse.java         
 │   │   └── utils/SecurityUtils.java
 │   │
-│   ├── security/                        (Authentication & Authorization)
-│   │   ├── JwtTokenProvider.java
-│   │   └── JwtAuthenticationFilter.java
-│   │
 │   ├── booking/                         (BOOKING DOMAIN - Core)
 │   │   ├── controller/                  <-- Layer 1
 │   │   │   └── BookingController.java   
@@ -59,112 +55,74 @@ backend/
 │   │       └── BookingResponseDTO.java
 │   │
 │   ├── customer/                        (CUSTOMER & VEHICLE DOMAIN)
-│   │   ├── controller/
-│   │   │   ├── CustomerController.java
-│   │   │   └── VehicleController.java
-│   │   ├── service/
-│   │   │   ├── CustomerService.java
-│   │   │   └── VehicleService.java
-│   │   ├── repository/
-│   │   │   ├── CustomerRepository.java
-│   │   │   ├── VehicleRepository.java
-│   │   │   └── TierRepository.java      
-│   │   ├── entity/
-│   │   │   ├── Customer.java
-│   │   │   ├── Vehicle.java
-│   │   │   └── Tier.java
-│   │   └── dto/CustomerProfileDTO.java
+│   │   ├── controller/CustomerController.java
+│   │   ├── service/CustomerService.java
+│   │   ├── repository/CustomerRepository.java
+│   │   └── entity/Customer.java
 │   │
 │   ├── branch/                          (BRANCH & STAFF DOMAIN)
-│   │   ├── controller/
-│   │   │   ├── BranchController.java
-│   │   │   └── StaffController.java     
-│   │   ├── service/
-│   │   │   ├── BranchService.java
-│   │   │   └── StaffService.java
-│   │   ├── repository/
-│   │   │   ├── BranchRepository.java
-│   │   │   ├── StaffRepository.java
-│   │   │   ├── ShiftRepository.java
-│   │   │   └── AttendanceRecordRepository.java
-│   │   └── entity/
-│   │       ├── Branch.java
-│   │       ├── Staff.java
-│   │       ├── Shift.java
-│   │       └── AttendanceRecord.java
+│   │   ├── controller/BranchController.java
+│   │   ├── service/BranchService.java
+│   │   ├── repository/BranchRepository.java
+│   │   └── entity/Branch.java
 │   │
-│   ├── loyalty/                         (LOYALTY & VOUCHER DOMAIN)
-│   │   ├── controller/
-│   │   │   ├── LoyaltyController.java
-│   │   │   └── VoucherController.java
-│   │   ├── service/
-│   │   │   ├── LoyaltyService.java
-│   │   │   └── VoucherService.java
-│   │   ├── repository/
-│   │   │   ├── LoyaltyPointsRepository.java
-│   │   │   └── VoucherRepository.java
-│   │   ├── entity/
-│   │   │   ├── LoyaltyPoints.java
-│   │   │   └── Voucher.java
-│   │   └── event/                       (RabbitMQ Listeners - Asynchronous)
-│   │       └── BookingCompletedListener.java 
-│   │
-│   └── review/                          (REVIEW DOMAIN)
-│       ├── controller/ReviewController.java
-│       ├── service/ReviewService.java
-│       ├── repository/ReviewRepository.java
-│       └── entity/Review.java
+│   └── loyalty/                         (LOYALTY & VOUCHER DOMAIN)
+│       ├── controller/LoyaltyController.java
+│       ├── service/LoyaltyService.java
+│       ├── repository/LoyaltyPointsRepository.java
+│       └── entity/LoyaltyPoints.java
 ```
 
-### Frontend (React - MVC View Role)
+### Frontend (C# Blazor WebAssembly - MVC View Role)
+In the Blazor model, we write UI using HTML combined with C# code (`.razor`) instead of JavaScript/React.
+
 ```text
 frontend/
-├── src/
-│   ├── api/                             (API Client Layer)
-│   │   ├── axiosClient.js               
-│   │   ├── bookingApi.js                
-│   │   ├── customerApi.js               
-│   │   ├── branchApi.js                 
-│   │   └── loyaltyApi.js                
+├── AutoWash.Frontend.csproj             (C# Blazor Project File)
+├── Program.cs                           (DI Configuration, HttpClient Setup)
+├── wwwroot/                             (Static web assets)
+│   ├── css/app.css
+│   └── index.html
+│
+├── Services/                            (API Client Layer connecting to Backend)
+│   ├── HttpInterceptorService.cs        (Automatically attaches JWT Tokens)
+│   ├── IBookingService.cs
+│   ├── BookingService.cs                (Calls /api/v1/bookings)
+│   ├── ICustomerService.cs
+│   └── IAuthService.cs
+│
+├── Models/                              (DTOs mapped from Backend)
+│   ├── BookingRequest.cs
+│   ├── BookingResponse.cs
+│   └── CustomerProfile.cs
+│
+├── Components/                          (Shared UI Components)
+│   ├── Common/                          
+│   ├── Booking/                     
+│   │   ├── BranchSelector.razor         
+│   │   ├── TimeSlotPicker.razor         
+│   │   └── VehiclePicker.razor          
+│   └── Layout/
+│       ├── MainLayout.razor
+│       └── NavMenu.razor
+│
+├── Pages/                               (MAIN VIEWS)
+│   ├── Auth/
+│   │   └── Login.razor
 │   │
-│   ├── context/                         (Global State Management)
-│   │   ├── AuthContext.jsx              
-│   │   └── BookingFlowContext.jsx       
+│   ├── Customer/                        (User Portal)
+│   │   ├── Dashboard.razor              
+│   │   ├── MyVehicles.razor             
+│   │   └── MyVouchers.razor
 │   │
-│   ├── hooks/                           (Custom Logic)
-│   │   ├── useVehicles.js               
-│   │   └── useAvailableSlots.js         
+│   ├── Booking/                         (Booking Flow)
+│   │   ├── CreateBooking.razor          
+│   │   └── BookingSuccess.razor   
 │   │
-│   ├── components/                      (Shared UI Components)
-│   │   ├── common/                      
-│   │   ├── booking/                     
-│   │   │   ├── BranchSelector.jsx       
-│   │   │   ├── TimeSlotPicker.jsx       
-│   │   │   └── VehiclePicker.jsx        
-│   │   └── reviews/
-│   │       └── StarRating.jsx
-│   │
-│   ├── pages/                           (MAIN VIEWS)
-│   │   ├── auth/
-│   │   │   └── Login.jsx
-│   │   │
-│   │   ├── customer/                    (User Portal)
-│   │   │   ├── Dashboard.jsx            
-│   │   │   ├── MyVehicles.jsx           
-│   │   │   └── MyVouchers.jsx
-│   │   │
-│   │   ├── booking/                     (Booking Flow)
-│   │   │   ├── CreateBookingPage.jsx    
-│   │   │   └── BookingSuccessPage.jsx   
-│   │   │
-│   │   └── admin/                       (Admin & Staff Portal)
-│   │       ├── BranchManagement.jsx     
-│   │       ├── StaffManagement.jsx      
-│   │       └── AttendanceCheck.jsx      
-│   │
-│   ├── routes/
-│   │   ├── AppRoutes.jsx                
-│   │   └── PrivateRoute.jsx             
-│   │
-│   └── App.jsx
+│   └── Admin/                           (Admin & Staff Portal)
+│       ├── BranchManagement.razor       
+│       └── StaffManagement.razor        
+│
+├── _Imports.razor                       (Global using directives)
+└── App.razor                            (Routing Configuration)
 ```

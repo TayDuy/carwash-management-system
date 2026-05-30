@@ -1,17 +1,17 @@
 # Kiến trúc MVC2 và 3-Layer trong hệ thống AutoWash Pro
 
-Tài liệu này mô tả cách hệ thống **AutoWash Pro** kết hợp mô hình **MVC2** và **Kiến trúc 3 Lớp (3-Layer Architecture)** sử dụng **Spring Boot (Backend)** và **React (Frontend)**.
+Tài liệu này mô tả cách hệ thống **AutoWash Pro** kết hợp mô hình **MVC2** và **Kiến trúc 3 Lớp (3-Layer Architecture)** sử dụng **Spring Boot (Backend)** và **C# Blazor (Frontend)**.
 
 ## 1. Sự kết hợp giữa MVC2 và 3-Layer
 Theo mô hình client-server hiện đại:
-- **View (Giao diện):** Được tách biệt hoàn toàn sang Frontend sử dụng **React**.
-- **Controller và Model:** Nằm ở Backend sử dụng **Spring Boot**.
+- **View (Giao diện):** Được tách biệt hoàn toàn sang Frontend sử dụng **C# Blazor WebAssembly** (chạy trực tiếp trên trình duyệt bằng WebAssembly).
+- **Controller và Model:** Nằm ở Backend sử dụng **Spring Boot** (Java).
 - Bản thân Backend Spring Boot được tổ chức theo **Kiến trúc 3 Lớp** để đảm bảo dễ bảo trì và mở rộng.
 
 ## 2. Mô hình 3-Layer (Backend Spring Boot)
 
 ### Tầng 1: Presentation Layer (Controller Layer)
-- **Nhiệm vụ:** Tiếp nhận HTTP Request từ React, xác thực JWT, validate dữ liệu (DTO), và trả về HTTP Response (JSON). Tầng này không chứa logic nghiệp vụ.
+- **Nhiệm vụ:** Tiếp nhận HTTP Request từ Blazor Frontend, xác thực JWT, validate dữ liệu (DTO), và trả về HTTP Response (JSON). Tầng này không chứa logic nghiệp vụ.
 - **Thành phần:** Các class `@RestController`.
 - **Ví dụ:** `BookingController`, `AuthController`.
 
@@ -40,10 +40,6 @@ backend/
 │   │   ├── dto/ApiResponse.java         
 │   │   └── utils/SecurityUtils.java
 │   │
-│   ├── security/                        (Xác thực & Phân quyền)
-│   │   ├── JwtTokenProvider.java
-│   │   └── JwtAuthenticationFilter.java
-│   │
 │   ├── booking/                         (NGHIỆP VỤ ĐẶT LỊCH - Trọng tâm)
 │   │   ├── controller/                  <-- Layer 1
 │   │   │   └── BookingController.java   (API: POST /bookings, GET /bookings/{id})
@@ -59,112 +55,74 @@ backend/
 │   │       └── BookingResponseDTO.java
 │   │
 │   ├── customer/                        (NGHIỆP VỤ KHÁCH HÀNG & XE)
-│   │   ├── controller/
-│   │   │   ├── CustomerController.java
-│   │   │   └── VehicleController.java
-│   │   ├── service/
-│   │   │   ├── CustomerService.java
-│   │   │   └── VehicleService.java
-│   │   ├── repository/
-│   │   │   ├── CustomerRepository.java
-│   │   │   ├── VehicleRepository.java
-│   │   │   └── TierRepository.java      (Bảng Tiers - Hạng thành viên)
-│   │   ├── entity/
-│   │   │   ├── Customer.java
-│   │   │   ├── Vehicle.java
-│   │   │   └── Tier.java
-│   │   └── dto/CustomerProfileDTO.java
+│   │   ├── controller/CustomerController.java
+│   │   ├── service/CustomerService.java
+│   │   ├── repository/CustomerRepository.java
+│   │   └── entity/Customer.java
 │   │
 │   ├── branch/                          (NGHIỆP VỤ CHI NHÁNH & NHÂN SỰ)
-│   │   ├── controller/
-│   │   │   ├── BranchController.java
-│   │   │   └── StaffController.java     (Bao gồm cả quản lý Shift & Attendance)
-│   │   ├── service/
-│   │   │   ├── BranchService.java
-│   │   │   └── StaffService.java
-│   │   ├── repository/
-│   │   │   ├── BranchRepository.java
-│   │   │   ├── StaffRepository.java
-│   │   │   ├── ShiftRepository.java
-│   │   │   └── AttendanceRecordRepository.java
-│   │   └── entity/
-│   │       ├── Branch.java
-│   │       ├── Staff.java
-│   │       ├── Shift.java
-│   │       └── AttendanceRecord.java
+│   │   ├── controller/BranchController.java
+│   │   ├── service/BranchService.java
+│   │   ├── repository/BranchRepository.java
+│   │   └── entity/Branch.java
 │   │
-│   ├── loyalty/                         (NGHIỆP VỤ ĐIỂM THƯỞNG & VOUCHER)
-│   │   ├── controller/
-│   │   │   ├── LoyaltyController.java
-│   │   │   └── VoucherController.java
-│   │   ├── service/
-│   │   │   ├── LoyaltyService.java
-│   │   │   └── VoucherService.java
-│   │   ├── repository/
-│   │   │   ├── LoyaltyPointsRepository.java
-│   │   │   └── VoucherRepository.java
-│   │   ├── entity/
-│   │   │   ├── LoyaltyPoints.java
-│   │   │   └── Voucher.java
-│   │   └── event/                       (RabbitMQ Listeners - Asynchronous)
-│   │       └── BookingCompletedListener.java (Lắng nghe để cộng điểm tự động)
-│   │
-│   └── review/                          (NGHIỆP VỤ ĐÁNH GIÁ)
-│       ├── controller/ReviewController.java
-│       ├── service/ReviewService.java
-│       ├── repository/ReviewRepository.java
-│       └── entity/Review.java
+│   └── loyalty/                         (NGHIỆP VỤ ĐIỂM THƯỞNG & VOUCHER)
+│       ├── controller/LoyaltyController.java
+│       ├── service/LoyaltyService.java
+│       ├── repository/LoyaltyPointsRepository.java
+│       └── entity/LoyaltyPoints.java
 ```
 
-### Frontend (React - Vai trò MVC View)
+### Frontend (C# Blazor WebAssembly - Vai trò MVC View)
+Ở mô hình Blazor, chúng ta viết giao diện bằng HTML kết hợp với C# code (`.razor`) thay vì JavaScript/React.
+
 ```text
 frontend/
-├── src/
-│   ├── api/                             (Lớp giao tiếp với Backend)
-│   │   ├── axiosClient.js               (Base Axios kèm JWT)
-│   │   ├── bookingApi.js                (Gọi API booking/)
-│   │   ├── customerApi.js               (Gọi API customer/)
-│   │   ├── branchApi.js                 (Gọi API branch/)
-│   │   └── loyaltyApi.js                (Gọi API loyalty/)
+├── AutoWash.Frontend.csproj             (File quản lý project C# Blazor)
+├── Program.cs                           (Cấu hình DI, đăng ký HttpClient gọi Backend)
+├── wwwroot/                             (Các file tĩnh)
+│   ├── css/app.css
+│   └── index.html
+│
+├── Services/                            (Lớp gọi API Spring Boot Backend qua HTTP)
+│   ├── HttpInterceptorService.cs        (Tự động gắn JWT Token vào request)
+│   ├── IBookingService.cs
+│   ├── BookingService.cs                (Gọi API /api/v1/bookings)
+│   ├── ICustomerService.cs
+│   └── IAuthService.cs
+│
+├── Models/                              (Các DTOs (Model) mapping từ dữ liệu Backend)
+│   ├── BookingRequest.cs
+│   ├── BookingResponse.cs
+│   └── CustomerProfile.cs
+│
+├── Components/                          (Thành phần UI chia nhỏ dùng chung)
+│   ├── Common/                          (Nút, Input, Modal...)
+│   ├── Booking/                     
+│   │   ├── BranchSelector.razor         (Giao diện chọn chi nhánh)
+│   │   ├── TimeSlotPicker.razor         (Giao diện chọn giờ)
+│   │   └── VehiclePicker.razor          (Giao diện chọn xe)
+│   └── Layout/
+│       ├── MainLayout.razor
+│       └── NavMenu.razor
+│
+├── Pages/                               (CÁC TRANG HIỂN THỊ CHÍNH - Tầng VIEW)
+│   ├── Auth/
+│   │   └── Login.razor
 │   │
-│   ├── context/                         (Global State - Giống Model nội bộ của Client)
-│   │   ├── AuthContext.jsx              (Lưu Token và thông tin User hiện tại)
-│   │   └── BookingFlowContext.jsx       (Lưu state tạm thời khi user đang trải qua nhiều bước đặt lịch)
+│   ├── Customer/                        (Khu vực User)
+│   │   ├── Dashboard.razor              (Xem lịch sắp tới, điểm Loyalty)
+│   │   ├── MyVehicles.razor             
+│   │   └── MyVouchers.razor
 │   │
-│   ├── hooks/                           (Tách logic ra khỏi giao diện)
-│   │   ├── useVehicles.js               (Lấy danh sách xe của user)
-│   │   └── useAvailableSlots.js         (Lấy slot trống từ backend dựa trên Branch)
+│   ├── Booking/                         (Luồng đặt lịch chính)
+│   │   ├── CreateBooking.razor          
+│   │   └── BookingSuccess.razor   
 │   │
-│   ├── components/                      (Thành phần UI chia nhỏ)
-│   │   ├── common/                      (Nút, Input, Modal...)
-│   │   ├── booking/                     
-│   │   │   ├── BranchSelector.jsx       (Giao diện chọn chi nhánh)
-│   │   │   ├── TimeSlotPicker.jsx       (Giao diện chọn giờ)
-│   │   │   └── VehiclePicker.jsx        (Giao diện chọn xe)
-│   │   └── reviews/
-│   │       └── StarRating.jsx
-│   │
-│   ├── pages/                           (CÁC TRANG HIỂN THỊ CHÍNH - Tầng VIEW)
-│   │   ├── auth/
-│   │   │   └── Login.jsx
-│   │   │
-│   │   ├── customer/                    (Khu vực User)
-│   │   │   ├── Dashboard.jsx            (Xem lịch sắp tới, điểm Loyalty)
-│   │   │   ├── MyVehicles.jsx           (Quản lý xe - Thêm/Xóa xe)
-│   │   │   └── MyVouchers.jsx
-│   │   │
-│   │   ├── booking/                     (Luồng đặt lịch chính)
-│   │   │   ├── CreateBookingPage.jsx    (Trang đặt lịch mới)
-│   │   │   └── BookingSuccessPage.jsx   
-│   │   │
-│   │   └── admin/                       (Khu vực Quản trị viên & Nhân viên)
-│   │       ├── BranchManagement.jsx     (Xem công suất các chi nhánh)
-│   │       ├── StaffManagement.jsx      (Quản lý lịch làm việc/Shifts)
-│   │       └── AttendanceCheck.jsx      (Chấm công)
-│   │
-│   ├── routes/
-│   │   ├── AppRoutes.jsx                (Map URL với Component, ví dụ: /booking -> CreateBookingPage)
-│   │   └── PrivateRoute.jsx             (Chặn chưa đăng nhập không cho vào đặt lịch)
-│   │
-│   └── App.jsx
+│   └── Admin/                           (Khu vực Quản trị viên & Nhân viên)
+│       ├── BranchManagement.razor       
+│       └── StaffManagement.razor        
+│
+├── _Imports.razor                       (Khai báo các thư viện using chung)
+└── App.razor                            (Cấu hình Routing cho ứng dụng)
 ```
