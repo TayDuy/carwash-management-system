@@ -1,10 +1,10 @@
 # Kiến trúc MVC2 và 3-Layer trong hệ thống AutoWash Pro
 
-Tài liệu này mô tả cách hệ thống **AutoWash Pro** kết hợp mô hình **MVC2** và **Kiến trúc 3 Lớp (3-Layer Architecture)** sử dụng **Spring Boot (Backend)** và **React (Frontend)**.
+Tài liệu này mô tả cách hệ thống **AutoWash Pro** kết hợp mô hình **MVC2** và **Kiến trúc 3 Lớp (3-Layer Architecture)** sử dụng **Spring Boot (Backend)** và **React / JavaScript (Frontend)**.
 
 ## 1. Sự kết hợp giữa MVC2 và 3-Layer
 Theo mô hình client-server hiện đại:
-- **View (Giao diện):** Được tách biệt hoàn toàn sang Frontend sử dụng **React**.
+- **View (Giao diện):** Được tách biệt hoàn toàn sang Frontend sử dụng **React (JavaScript)**.
 - **Controller và Model:** Nằm ở Backend sử dụng **Spring Boot**.
 - Bản thân Backend Spring Boot được tổ chức theo **Kiến trúc 3 Lớp** để đảm bảo dễ bảo trì và mở rộng.
 
@@ -116,7 +116,7 @@ backend/
 │       └── entity/Review.java
 ```
 
-### Frontend (React - Vai trò MVC View)
+### Frontend (React / JavaScript - Vai trò MVC View)
 ```text
 frontend/
 ├── src/

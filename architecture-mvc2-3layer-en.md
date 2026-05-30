@@ -1,17 +1,17 @@
 # MVC2 and 3-Layer Architecture in AutoWash Pro
 
-This document describes how the **AutoWash Pro** system integrates the **MVC2** model and **3-Layer Architecture** using **Spring Boot (Backend)** and **React (Frontend)**.
+This document describes how the **AutoWash Pro** system integrates the **MVC2** model and **3-Layer Architecture** using **Spring Boot (Backend)** and **React / JavaScript (Frontend)**.
 
 ## 1. Integrating MVC2 and 3-Layer Architecture
 Following the modern client-server model:
-- **View:** Completely decoupled to the Frontend using **React**.
-- **Controller and Model:** Handled on the Backend using **Spring Boot**.
+- **View:** Completely decoupled to the Frontend using **React (JavaScript)**.
+- **Controller and Model:** Handled on the Backend using **Spring Boot** (Java).
 - The Spring Boot Backend itself is structured using the **3-Layer Architecture** to ensure maintainability and scalability.
 
 ## 2. The 3-Layer Model (Spring Boot Backend)
 
 ### Layer 1: Presentation Layer (Controller Layer)
-- **Role:** Handles HTTP Requests from React, validates JWTs, validates input data (DTOs), and returns HTTP Responses (JSON). This layer does NOT contain business logic.
+- **Role:** Handles HTTP Requests from the React Frontend, validates JWTs, validates input data (DTOs), and returns HTTP Responses (JSON). This layer does NOT contain business logic.
 - **Components:** Classes annotated with `@RestController`.
 - **Examples:** `BookingController`, `AuthController`.
 
@@ -40,10 +40,6 @@ backend/
 │   │   ├── dto/ApiResponse.java         
 │   │   └── utils/SecurityUtils.java
 │   │
-│   ├── security/                        (Authentication & Authorization)
-│   │   ├── JwtTokenProvider.java
-│   │   └── JwtAuthenticationFilter.java
-│   │
 │   ├── booking/                         (BOOKING DOMAIN - Core)
 │   │   ├── controller/                  <-- Layer 1
 │   │   │   └── BookingController.java   
@@ -59,64 +55,25 @@ backend/
 │   │       └── BookingResponseDTO.java
 │   │
 │   ├── customer/                        (CUSTOMER & VEHICLE DOMAIN)
-│   │   ├── controller/
-│   │   │   ├── CustomerController.java
-│   │   │   └── VehicleController.java
-│   │   ├── service/
-│   │   │   ├── CustomerService.java
-│   │   │   └── VehicleService.java
-│   │   ├── repository/
-│   │   │   ├── CustomerRepository.java
-│   │   │   ├── VehicleRepository.java
-│   │   │   └── TierRepository.java      
-│   │   ├── entity/
-│   │   │   ├── Customer.java
-│   │   │   ├── Vehicle.java
-│   │   │   └── Tier.java
-│   │   └── dto/CustomerProfileDTO.java
+│   │   ├── controller/CustomerController.java
+│   │   ├── service/CustomerService.java
+│   │   ├── repository/CustomerRepository.java
+│   │   └── entity/Customer.java
 │   │
 │   ├── branch/                          (BRANCH & STAFF DOMAIN)
-│   │   ├── controller/
-│   │   │   ├── BranchController.java
-│   │   │   └── StaffController.java     
-│   │   ├── service/
-│   │   │   ├── BranchService.java
-│   │   │   └── StaffService.java
-│   │   ├── repository/
-│   │   │   ├── BranchRepository.java
-│   │   │   ├── StaffRepository.java
-│   │   │   ├── ShiftRepository.java
-│   │   │   └── AttendanceRecordRepository.java
-│   │   └── entity/
-│   │       ├── Branch.java
-│   │       ├── Staff.java
-│   │       ├── Shift.java
-│   │       └── AttendanceRecord.java
+│   │   ├── controller/BranchController.java
+│   │   ├── service/BranchService.java
+│   │   ├── repository/BranchRepository.java
+│   │   └── entity/Branch.java
 │   │
-│   ├── loyalty/                         (LOYALTY & VOUCHER DOMAIN)
-│   │   ├── controller/
-│   │   │   ├── LoyaltyController.java
-│   │   │   └── VoucherController.java
-│   │   ├── service/
-│   │   │   ├── LoyaltyService.java
-│   │   │   └── VoucherService.java
-│   │   ├── repository/
-│   │   │   ├── LoyaltyPointsRepository.java
-│   │   │   └── VoucherRepository.java
-│   │   ├── entity/
-│   │   │   ├── LoyaltyPoints.java
-│   │   │   └── Voucher.java
-│   │   └── event/                       (RabbitMQ Listeners - Asynchronous)
-│   │       └── BookingCompletedListener.java 
-│   │
-│   └── review/                          (REVIEW DOMAIN)
-│       ├── controller/ReviewController.java
-│       ├── service/ReviewService.java
-│       ├── repository/ReviewRepository.java
-│       └── entity/Review.java
+│   └── loyalty/                         (LOYALTY & VOUCHER DOMAIN)
+│       ├── controller/LoyaltyController.java
+│       ├── service/LoyaltyService.java
+│       ├── repository/LoyaltyPointsRepository.java
+│       └── entity/LoyaltyPoints.java
 ```
 
-### Frontend (React - MVC View Role)
+### Frontend (React / JavaScript - MVC View Role)
 ```text
 frontend/
 ├── src/
